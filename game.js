@@ -57,36 +57,68 @@ function createplayer(name,symbol){
 function Gamecontroller(playerone,playertwo){
    
    const cb=creategameboard();
+   let flagwinner=false;
    let playerlist=[];
     playerlist.push(createplayer(playerone,"X"));
     playerlist.push(createplayer(playertwo,"O"));
    let currplayer=playerlist[0];
-       function makemove(index){
+       function makemove(index,element){
+        if(flagwinner){
+            return;
+        }
+         let imgx=document.createElement('img');
+        imgx.src="./x.png";
+         let imgo=document.createElement('img');
+        imgo.src="./o.png";
+        let temp=currplayer;
         if(cb.mark(index,currplayer.symbol)){
-            if(cb.iswin(currplayer.symbol)){
-                console.log(`${currplayer.name} is the winner`)
-            }
-            else{
-                if(currplayer==playerlist[0]){
+            
+            if(currplayer==playerlist[0]){
+                    element.appendChild(imgx);
                     currplayer=playerlist[1];
+
                 }
                 else{
+                    element.appendChild(imgo);
                     currplayer=playerlist[0];
                 }
-            }
-        }else{
-            console.log("Invalid move");
+              
+                }else{
+            alert("invalid move")
         }
+         if(cb.iswin(temp.symbol)){
+                alert(`${temp.name} is the winner`);
+                flagwinner=true;
+              } 
 
         console.log(cb.getboard());
                 
        }
-       return {makemove}
+       function getplayer(){
+        return currplayer;
+       }
+       return {makemove,getplayer}
 }
-const gc=Gamecontroller("Adithya","Rahul");
-gc.makemove(1);
-gc.makemove(2);
-gc.makemove(0);
-gc.makemove(4);
-gc.makemove(8);
-gc.makemove(6);
+function displaycontroller(player1,player2){
+   const main=Gamecontroller(player1,player2);
+   
+   let curplayer=document.getElementById("turn");
+   curplayer.textContent="To play-"+main.getplayer().name;
+   let cell=document.querySelectorAll(".cell");
+  cell.forEach(element => {
+          element.addEventListener('click',()=>{
+           
+            main.makemove(element.dataset.index,element);
+            
+            curplayer.textContent="To play-"+main.getplayer().name;
+          })
+   });
+}
+ 
+
+let button=document.getElementById("start-btn");
+button.addEventListener('click',function(){
+    let player1=document.getElementById("player1").value;
+let player2=document.getElementById("player2").value;
+   displaycontroller(player1,player2);
+})
